@@ -46,6 +46,8 @@ gui.config(background= "grey1")
 #Gui.minsize(800,400)
 gui.geometry( '800x400')
 gui.resizable( True , True)
+Grid.rowconfigure(gui , 0 , weight = 1)
+Grid.columnconfigure(gui , 0 , weight = 1)
 
 #Font1 = tkinter.font.Font(family = 'Helvetica', size = 18, weight = 'bold')
 
@@ -72,19 +74,19 @@ def ChangePWM(self):
 	
 
 Button1 = Button(gui, text='Clockwise Motor ', command = motorClockwise, bg='green2', height = 2, width = 15)
-Button1.grid(row=1,column=0)
+Button1.grid(row=1,column=0, sticky = "NSEW" )
 
 Button3 = Button(gui, text='Counter Clockwise ', command = motorAntiClockwise, bg='deep sky blue', padx = 30, height = 2, width = 10)
-Button3.grid(row=1,column=1)
+Button3.grid(row=1,column=1, sticky = "NSEW" )
 
 Button2 = Button(gui, text=' Motor  Stop', command = motorStop, bg='red', height = 2, width = 10)
-Button2.grid(row=1,column=2)
+Button2.grid(row=1,column=2, sticky = "NSEW" )
 
 Text3 = Label(gui,text='Motor  RPM', bg = 'grey1', fg='#FFFFFF', height = 2, width = 10)#, padx = 10, pady = 10)
 Text3.grid(row=2,columnspan=1)
 
 Scale1 = Scale(gui, from_=40, to=100, orient = HORIZONTAL, resolution = 1, command = ChangePWM, length=250, width=20)
-Scale1.grid(row=2,column=1, columnspan=3)
+Scale1.grid(row=2,column=1, columnspan=3 , sticky = "NSEW" )
 
 ########################################
 
