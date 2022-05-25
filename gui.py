@@ -83,10 +83,10 @@ Button2 = Button(gui, text=' Motor  Stop', command = motorStop, bg='red', height
 Button2.grid(row=0,column=2, sticky = "NSEW" )
 
 Text3 = Label(gui,text='Motor  RPM', bg = 'grey1', fg='#FFFFFF', height = 2, width = 10)#, padx = 10, pady = 10)
-Text3.grid(row=1,columnspan=1)
+Text3.grid(row=1,column = 0 , columnspan=1 , sticky = "NSEW" )
 
 Scale1 = Scale(gui, from_=40, to=100, orient = HORIZONTAL, resolution = 1, command = ChangePWM, length=250, width=20)
-Scale1.grid(row=2,column=1, columnspan=3 , sticky = "NSEW" )
+Scale1.grid(row=1,column=2, columnspan=3 , sticky = "NSEW" )
 
 ########################################
 
