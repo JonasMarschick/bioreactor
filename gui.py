@@ -59,7 +59,7 @@ def motorAntiClockwise():
     GPIO.output(motor1A, GPIO.HIGH) # Motor will move in anti-clockwise direction.
     GPIO.output(motor1B, GPIO.LOW)
 
-def motor1Stop():
+def motorStop():
     GPIO.output(motor1A, GPIO.LOW) # Motor will stop.
     GPIO.output(motor1B, GPIO.LOW)
     
