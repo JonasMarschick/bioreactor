@@ -89,7 +89,7 @@ Text3 = Label(gui,text='Motor  RPM', bg = 'grey1', fg='#FFFFFF', height = 2, wid
 Text3.grid(row=1,column = 0 , columnspan=1 , sticky = "NSEW" )
 
 Scale1 = Scale(gui, from_=40, to=100, orient = HORIZONTAL, resolution = 1, command = ChangePWM, length=250, width=15)
-Scale1.grid(row=1,column=2,  sticky = "NSEW" )
+Scale1.grid(row=1,column=2)
 
 ########################################
 
