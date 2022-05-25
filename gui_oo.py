@@ -10,7 +10,7 @@ class Gui(tk.Tk):
     
     super().__init__()
     
-    self.geomtry('800x400')
+    self.geometry('800x400')
     
     self.title("Spinfinity")
     
