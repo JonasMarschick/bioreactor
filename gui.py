@@ -18,16 +18,16 @@ motor1B = 18 # Connected to Input 2.
 GPIO.setmode(GPIO.BOARD) # We are accessing GPIOs according to their physical location
 
 GPIO.setup(PWMPin, GPIO.OUT) # We have set our pin mode to output
-GPIO.setup(Motor1A, GPIO.OUT)
-GPIO.setup(Motor1B, GPIO.OUT)
+GPIO.setup(motor1A, GPIO.OUT)
+GPIO.setup(motor1B, GPIO.OUT)
 ############################
 
 
 #Now set the start speed to be LOW
 
 GPIO.output(PWMPin, GPIO.LOW) # When it will start then all Pins will be LOW.
-GPIO.output(Motor1A, GPIO.LOW)
-GPIO.output(Motor1B, GPIO.LOW)
+GPIO.output(motor1A, GPIO.LOW)
+GPIO.output(motor1B, GPIO.LOW)
 #############################
 
 
