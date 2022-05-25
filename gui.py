@@ -46,8 +46,11 @@ gui.config(background= "grey1")
 #Gui.minsize(800,400)
 gui.geometry( '800x400')
 gui.resizable( True , True)
-Grid.rowconfigure(gui , weight = 1)
-Grid.columnconfigure(gui , weight = 1)
+gui.rowconfigure( 0 , weight = 1)
+gui.rowconfigure( 1 , weight = 1)
+gui.columnconfigure( 0 , weight = 1)
+gui.columnconfigure( 1 , weight = 1)
+gui.columnconfigure( 2 , weight = 1)
 
 #Font1 = tkinter.font.Font(family = 'Helvetica', size = 18, weight = 'bold')
 
