@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 import time
+import RPi.GPIO as GPIO
 
 
 class Gui(tk.Tk):
