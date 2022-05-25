@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import tkk
+from tkinter import ttk
 import time
 
 
@@ -34,16 +34,16 @@ class Gui(tk.Tk):
     clockwise_button.grid(row=0,column=0, sticky = "NSEW" )
     
     
-    anti_clockwise_button = Button(self, text='Counter Clockwise ', command = motorAntiClockwise, bg='deep sky blue',  height = 2, width = 15)
+    anti_clockwise_button = ttk.Button(self, text='Counter Clockwise ', command = motorAntiClockwise, bg='deep sky blue',  height = 2, width = 15)
     anti_clockwise_button.grid(row=0,column=1, sticky = "NSEW" )
 
-    motor_stop_button = Button(self, text=' Motor  Stop', command = motorStop, bg='red', height = 2, width = 15)
+    motor_stop_button = ttk.Button(self, text=' Motor  Stop', command = motorStop, bg='red', height = 2, width = 15)
     motor_stop_button.grid(row=0,column=2, sticky = "NSEW" )
 
-    motor_rpm_text = Label(self,text='Motor  RPM', bg = 'grey1', fg='#FFFFFF', height = 2, width = 15)
+    motor_rpm_text = ttk.Label(self,text='Motor  RPM', bg = 'grey1', fg='#FFFFFF', height = 2, width = 15)
     motor_rpm_text.grid(row=1,column = 0 , columnspan=1 , sticky = "NSEW" )
 
-    rpm_scale = Scale(gui, from_=40, to=100, orient = HORIZONTAL, resolution = 1, command = ChangePWM, length=250, width=15)
+    rpm_scale = ttk.Scale(gui, from_=40, to=100, orient = HORIZONTAL, resolution = 1, command = ChangePWM, length=250, width=15)
     rpm_scale.grid(row=1,column=2)
 
     
