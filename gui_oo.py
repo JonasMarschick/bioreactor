@@ -30,7 +30,7 @@ class Gui(tk.Tk):
     
   def create_widgets(self):
     
-    clockwise_button = tkk.Button( self , text='Clockwise Motor ', command = motorClockwise, bg='green2', height = 2, width = 15)
+    clockwise_button = ttk.Button( self , text='Clockwise Motor ', command = motorClockwise, bg='green2', height = 2, width = 15)
     
     clockwise_button.grid(row=0,column=0, sticky = "NSEW" )
     
