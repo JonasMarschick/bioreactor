@@ -90,4 +90,4 @@ Scale1.grid(row=2,column=1, columnspan=3)
 
 
 
-Gui.mainloop()
+gui.mainloop()
