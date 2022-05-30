@@ -10,8 +10,6 @@ cursor = conn.cursor()
 #fetch = cursor.fetchall()
 #print(fetch)
 
-print("hey")
-
 numOfProgram = 2
 
 def pullData(entry):
@@ -19,7 +17,6 @@ def pullData(entry):
 
     global numOfProgram
     numOfProgram = entry
-
 
 
 if __name__ == "__main__":
