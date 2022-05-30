@@ -25,7 +25,7 @@ def pullData(entry):
 if __name__ == "__main__":
 
     root = gui.Gui()
-    cursor.execute("SELECT *, oid FROM program WHERE programNumber = 2 ")
+    #cursor.execute("SELECT *, oid FROM program WHERE programNumber = 2 ")
     root.mainloop()
 
     #processor = raspberry.RaspberryConfiguration()
