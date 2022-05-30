@@ -6,9 +6,9 @@ import gui
 
 conn = sqlite3.connect("programs.db")
 cursor = conn.cursor()
-cursor.execute("SELECT *, oid FROM program ORDER BY programNumber")
-fetch = cursor.fetchall()
-print(fetch)
+#cursor.execute("SELECT *, oid FROM program ORDER BY programNumber")
+#fetch = cursor.fetchall()
+#print(fetch)
 
 print("hey")
 
