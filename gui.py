@@ -380,7 +380,7 @@ class Gui(ThemedTk):
 
             #self.progressBar.start([interval])
             self.raspberry.changePWM(notebookSelectedTabNumber , row[2])
-            time.sleep(row[1] * 60 * 60)
+            time.sleep(row[1])
             #time.sleep(row[2])
             #print("hey")
 
