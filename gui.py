@@ -33,7 +33,7 @@ class Gui(ThemedTk):
         self.mode()
         self.set_theme(self.theme)
 
-        #self.raspberry = raspberry.RaspberryConfiguration()
+        self.raspberry = raspberry.RaspberryConfiguration()
 
 
     def initGui(self):
