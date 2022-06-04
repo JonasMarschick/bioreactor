@@ -12,6 +12,8 @@ class RaspberryConfiguration():
                      "PWMPin3" : 31 , "MOTOR3A" : 31 , "MOTOR3B" : 33,
                      "PWMPin4" : 32 , "MOTOR4A" : 35 , "MOTOR4B" : 37,
                      "PWMPin5" : 22 , "MOTOR5A" : 24 , "MOTOR5B" : 26}
+        
+        self.listDicSetupKeys = list(self.dicSetup)
 
         self.list = []
 
@@ -25,11 +27,10 @@ class RaspberryConfiguration():
         for i in listOfIndexofPWMPin:
             for j in range(3):
                 
-                    str = self.dicSetup[i]
-                    print(str)
-
-                    GPIO.setup( str , GPIO.OUT)
-                    GPIO.output( str , GPIO.LOW)
+                    key = str(self.listDicSetupKeys[i])
+              
+                    GPIO.setup( self.dicSetup[key] , GPIO.OUT)
+                    GPIO.output( self.dicSetup[key] , GPIO.LOW)
                     i += 1
 
         for i in listOfIndexofPWMPin:
