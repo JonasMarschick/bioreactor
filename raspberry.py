@@ -35,7 +35,8 @@ class RaspberryConfiguration():
 
         for i in listOfIndexofPWMPin:
 
-            PwmValue = GPIO.PWM(self.dicSetup[i], 255)  # We have set our PWM frequency to 2000.
+            key = str(self.listDicSetupKeys[i])
+            PwmValue = GPIO.PWM(self.dicSetup[key], 255)  # We have set our PWM frequency to 2000.
             PwmValue.start(40) # That's the maximum value 100 %.
             self.list.append(PwmValue)
 
