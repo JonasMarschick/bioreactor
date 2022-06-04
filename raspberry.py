@@ -24,7 +24,7 @@ class RaspberryConfiguration():
             for j in range(3):
                 
                     str = self.dicSetup[i]
-                    print(str
+                    print(str)
 
                     GPIO.setup( str , GPIO.OUT)
                     GPIO.output( str , GPIO.LOW)
@@ -38,6 +38,7 @@ class RaspberryConfiguration():
 
 
         '''
+        print("hope not")
         GPIO.setup(self.PWMPin, GPIO.OUT) # We have set our pin mode to output
         GPIO.setup(self.Motor1A, GPIO.OUT)
         GPIO.setup(self.Motor1B, GPIO.OUT)
