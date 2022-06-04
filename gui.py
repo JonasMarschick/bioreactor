@@ -8,7 +8,7 @@ import os
 import sqlite3
 from ttkthemes import ThemedTk
 import threading
-#import raspberry
+import raspberry
 import time
 
 
@@ -374,8 +374,8 @@ class Gui(ThemedTk):
 
             totalTime += row[2]
 
-        interval = (totalTime / 100)  * 60 * 60 * 1000
-        #interval =  int ((totalTime / 100)  * 1000)
+        #interval = (totalTime / 100)  * 60 * 60 * 1000 # time in hours
+        interval =  int ((totalTime / 100)  * 1000) # time in seconds
 
         for row in fetch:
 
