@@ -1,4 +1,4 @@
-from tkinter import *
+
 import tkinter.ttk as ttk
 import tkinter.messagebox as tkMessageBox
 import tkinter.filedialog as filedialog
@@ -27,6 +27,7 @@ class Gui(ThemedTk):
         self.uniqueProgramNumberList = []
 
         self.initGui()
+        self.database()
         self.centerWindow()
         self.resizable()
         self.mode()
@@ -62,7 +63,7 @@ class Gui(ThemedTk):
         self.tree.heading("#1" , text = "RPM")
         self.tree.heading("#2" , text= "TIME")
         self.tree.grid(row = 2 , column = 0  , rowspan = 5 , columnspan = 6 , sticky = "NSEW" )
-        self.database()
+        #self.database()
 
         label1 = ttk.Label( self.frame1 , text = "Program" + "\n" + "Number:")
         label1.grid( row = 0 , column = 0 , sticky = "EW")
@@ -99,8 +100,6 @@ class Gui(ThemedTk):
 
         self.choseProgramCombobox = ttk.Combobox( self.frame1 , values =  self.comboBoxList , text = "Choose a" + "\n" + "Program" , width = 10 )
         self.choseProgramCombobox.grid( row = 2 , column = 6 , sticky = "SWE")
-        self.choseProgramCombobox.current( 0 )
-        #choseProgramCombobox.set(( "Program1" , "Program2" , "Program3" , "Program4"))
         #choseProgramCombobox.bind('<<ComboboxSelected>>' , self.someFunction)
 
         initiateProgramButton = ttk.Button ( self.frame1 , text = "Start" + "\n" + "Program" , width = 10 , command = lambda : threading.Thread( target = self.initiateProgram).start())
@@ -180,6 +179,11 @@ class Gui(ThemedTk):
 
             cursor.execute("SELECT *, oid FROM program")
             fetch = cursor.fetchall()
+
+            for data in fetch:
+                self.programNumberList.append(data[0])
+            self.uniqueElementsOfList()
+
             conn.commit()
             cursor.close()
 
@@ -209,6 +213,11 @@ class Gui(ThemedTk):
             cursor.execute("SELECT *, oid FROM program")
             conn.commit()
             fetch = cursor.fetchall()
+
+            for data in fetch:
+                self.programNumberList.append(data[0])
+            self.uniqueElementsOfList()
+
             cursor.close()
 
             self.tree.insert(val0, index="end", values=(fetch[-1][1], fetch[-1][2]))
@@ -399,6 +408,8 @@ class Gui(ThemedTk):
 
     def uniqueElementsOfList(self):
 
+        self.comboBoxList = []
+
         for el in self.programNumberList:
 
             if el not in self.uniqueProgramNumberList:
@@ -408,6 +419,12 @@ class Gui(ThemedTk):
         for el in self.uniqueProgramNumberList:
 
             self.comboBoxList.append("Program" + str(el))
+
+        self.choseProgramCombobox["values"] = self.comboBoxList
+
+        if ( not len(self.comboBoxList) == 0):
+
+            self.choseProgramCombobox.current([0])
 
 
 if __name__ == "__main__":
