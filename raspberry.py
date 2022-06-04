@@ -101,7 +101,7 @@ class RaspberryConfiguration():
         
     def printdic(self):
         
-        print(self.dicSetup[2])
+        print(self.dicSetup["MOTOR1A"])
 
 
     def motorClockwise( self , MOTORA , MOTORB):
