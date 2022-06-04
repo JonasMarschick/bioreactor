@@ -379,11 +379,9 @@ class Gui(ThemedTk):
         for row in fetch:
 
             #self.progressBar.start([interval])
-            self.raspberry.changePWM(notebookSelectedTabNumber , row[2])
-            time.sleep(row[1])
-            #time.sleep(row[2])
-            #print("hey")
-
+            self.raspberry.changePWM(notebookSelectedTabNumber , row[1])
+            time.sleep(row[2])
+           
         #self.progressBar.stop()
 
         self.raspberry.motorStop(MOTORA , MOTORB)
