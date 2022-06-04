@@ -7,11 +7,11 @@ class RaspberryConfiguration():
 
     def __init__(self):
 
-        self.dicSetup = { "PWMPin1" : 11 , "MOTOR1A" : 16 , "MOTOR1B" : 18 ,
-                     "PWMPin2" : 36 , "MOTOR2A" : 38 , "MOTOR2B" : 40,
-                     "PWMPin3" : 31 , "MOTOR3A" : 31 , "MOTOR3B" : 33,
-                     "PWMPin4" : 32 , "MOTOR4A" : 35 , "MOTOR4B" : 37,
-                     "PWMPin5" : 22 , "MOTOR5A" : 24 , "MOTOR5B" : 26}
+        self.dicSetup = { "PWMPin0" : 11 , "MOTOR0A" : 16 , "MOTOR0B" : 18 ,
+                     "PWMPin1" : 36 , "MOTOR1A" : 38 , "MOTOR1B" : 40,
+                     "PWMPin2" : 31 , "MOTOR2A" : 31 , "MOTOR2B" : 33,
+                     "PWMPin3" : 32 , "MOTOR3A" : 35 , "MOTOR3B" : 37,
+                     "PWMPin4" : 22 , "MOTOR4A" : 24 , "MOTOR4B" : 26}
         
         self.listDicSetupKeys = list(self.dicSetup)
 
