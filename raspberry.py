@@ -22,9 +22,12 @@ class RaspberryConfiguration():
 
         for i in listOfIndexofPWMPin:
             for j in range(3):
+                
+                    str = self.dicSetup[i]
+                    print(str
 
-                    GPIO.setup( self.dicSetup[i] , GPIO.OUT)
-                    GPIO.output(self.dicSetup[i] , GPIO.LOW)
+                    GPIO.setup( str , GPIO.OUT)
+                    GPIO.output( str , GPIO.LOW)
                     i += 1
 
         for i in listOfIndexofPWMPin:
