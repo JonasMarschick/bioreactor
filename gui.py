@@ -65,7 +65,7 @@ class Gui(ThemedTk):
         self.tree.grid(row = 2 , column = 0  , rowspan = 5 , columnspan = 6 , sticky = "NSEW" )
         #self.database()
 
-        label1 = ttk.Label( self.frame1 , text = "Program" + "\n" + "Number:")
+        label1 = ttk.Label( self.frame1 , text = ("Program" + "\n" + "Number") + ":")
         label1.grid( row = 0 , column = 0 , sticky = "E")
         programEntry = ttk.Entry(self.frame1 , width = 5)
         programEntry.grid( row = 0 , column = 1 ,  sticky = "EW" )
