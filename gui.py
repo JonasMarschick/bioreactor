@@ -67,9 +67,8 @@ class Gui(ThemedTk):
 
         label1 = ttk.Label( self.frame1 , text = "Program" + "\n" + "Number:")
         label1.grid( row = 0 , column = 0 , sticky = "EW")
-
         programEntry = ttk.Entry(self.frame1 , width = 5)
-        programEntry.grid( row = 0 , column = 1 ,  sticky = "EW" )
+        programEntry.grid( row = 0 , column = 1 ,  sticky = "W" )
 
 
         label2 = ttk.Label(self.frame1 , text = "RPM:")
@@ -77,18 +76,18 @@ class Gui(ThemedTk):
         label3 = ttk.Label(self.frame1 , text = " Scale:")
         label3.grid( row = 1 , column = 2 , sticky = "EW")
         rpmEntry = ttk.Entry(self.frame1 , width = 5)
-        rpmEntry.grid( row = 0 , column = 3 ,  sticky = "EW")
+        rpmEntry.grid( row = 0 , column = 3 ,  sticky = "W")
         self.rpmScale = Scale( self.frame1 , from_ = 0 , to = 100 , orient = HORIZONTAL , resolution = 5)
-        self.rpmScale.grid( row = 1 , column = 3)
+        self.rpmScale.grid( row = 1 , column = 3 , sticky = "W)
 
         label4 = ttk.Label(self.frame1, text = "TIME(H):")
         label4.grid ( row = 0 , column = 4,  sticky = "EW")
         label4 = ttk.Label(self.frame1 , text = "Scale:")
-        label4.grid( row = 1 , column = 4 , sticky = "EW")
+        label4.grid( row = 1 , column = 4 , sticky = "W")
         timeEntry = ttk.Entry(self.frame1 , width = 5)
         timeEntry.grid( row = 0  , column = 5 ,  sticky = "EW" )
         self.timeScale = Scale( self.frame1 , from_ = 0 , to = 100 , orient = HORIZONTAL , resolution = 1)
-        self.timeScale.grid( row = 1 , column = 5)
+        self.timeScale.grid( row = 1 , column = 5 , sticky = "W)
 
         addButton = ttk.Button(self.frame1 , text = "Add" ,
                               command = lambda : self.submitData(rpmEntry , timeEntry , programEntry , self.rpmScale , self.timeScale))
