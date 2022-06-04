@@ -105,8 +105,8 @@ class Gui(ThemedTk):
         initiateProgramButton = ttk.Button ( self.frame1 , text = "Start" + "\n" + "Program" , width = 10 , command = lambda : threading.Thread( target = self.initiateProgram).start())
         initiateProgramButton.grid ( row = 3 , column = 6 , sticky = "NWES")
 
-        self.style.configure("Horizontal.green.TProgressbar", foreground='green' , background = "black" , throughcolor = "black")
-        self.progressBar = ttk.Progressbar(self.frame1 , style = "green.TProgressbar"   , mode = "determinate")
+        #self.style.configure(green.TProgressbar", foreground='green' , background = "black" , throughcolor = "black")
+        self.progressBar = ttk.Progressbar(self.frame1 , mode = "determinate") # style = "green.TProgressbar
         self.progressBar.grid( row = 4 , column = 6 , sticky = "NWE" , pady = 0 )
 
         exportButton = ttk.Button( self.frame1 , text = "Export as" "\n" + " CSV" , command = self.export , width = 10 )
