@@ -102,7 +102,7 @@ class Gui(ThemedTk):
         #choseProgramCombobox.bind('<<ComboboxSelected>>' , self.someFunction)
 
         initiateProgramButton = ttk.Button ( self.frame1 , text = "Start" + "\n" + "Program" , width = 10 , command = lambda : threading.Thread( target = self.initiateProgram).start())
-        initiateProgramButton.grid ( row = 3 , column = 7 , sticky = "NWES" , padx = 20 )
+        initiateProgramButton.grid ( row = 3 , column = 7 , sticky = "NWE" , padx = 20 )
 
         #self.style.configure(green.TProgressbar", foreground='green' , background = "black" , throughcolor = "black")
         self.progressBar = ttk.Progressbar(self.frame1 , mode = "determinate") # style = "green.TProgressbar
