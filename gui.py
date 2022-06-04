@@ -91,28 +91,28 @@ class Gui(ThemedTk):
 
         addButton = ttk.Button(self.frame1 , text = "Add" ,
                               command = lambda : self.submitData(rpmEntry , timeEntry , programEntry , self.rpmScale , self.timeScale))
-        addButton.grid( row = 0  , column = 6 ,  sticky = "EW" )
+        addButton.grid( row = 0  , column = 7 ,  sticky = "EW" )
 
         removeButton = ttk.Button( self.frame1 , text = "Remove" ,
                                command = lambda : self.onRemove(self.tree.selection() , rpmEntry , timeEntry , programEntry , self.rpmScale , self.timeScale ))
-        removeButton.grid( row = 1 , column = 6 , sticky ="EW")
+        removeButton.grid( row = 1 , column = 7 , sticky ="EW")
 
         self.choseProgramCombobox = ttk.Combobox( self.frame1 , values =  self.comboBoxList , text = "Choose a" + "\n" + "Program" , width = 10 )
         self.choseProgramCombobox.grid( row = 2 , column = 6 , sticky = "SWE")
         #choseProgramCombobox.bind('<<ComboboxSelected>>' , self.someFunction)
 
         initiateProgramButton = ttk.Button ( self.frame1 , text = "Start" + "\n" + "Program" , width = 10 , command = lambda : threading.Thread( target = self.initiateProgram).start())
-        initiateProgramButton.grid ( row = 3 , column = 6 , sticky = "NWES")
+        initiateProgramButton.grid ( row = 3 , column = 7 , sticky = "NWES")
 
         #self.style.configure(green.TProgressbar", foreground='green' , background = "black" , throughcolor = "black")
         self.progressBar = ttk.Progressbar(self.frame1 , mode = "determinate") # style = "green.TProgressbar
-        self.progressBar.grid( row = 4 , column = 6 , sticky = "NWE" , pady = 0 )
+        self.progressBar.grid( row = 4 , column = 7 , sticky = "NWE" , pady = 0 )
 
         exportButton = ttk.Button( self.frame1 , text = "Export as" "\n" + " CSV" , command = self.export , width = 10 )
-        exportButton.grid( row = 5 , column = 6 , sticky = "EW")
+        exportButton.grid( row = 5 , column = 7 , sticky = "EW")
 
         modeButton = ttk.Button( self.frame1 , text = "Light/Dark" + "\n"  "mode" , command = self.mode , width = 10)
-        modeButton.grid(row = 6 , column = 6 , sticky = "EW")
+        modeButton.grid(row = 6 , column = 7 , sticky = "EW")
 
 
     def onRemove(self , iids , rpmEntry , timeEntry , programEntry , rpmScale , timeScale):
