@@ -98,7 +98,7 @@ class Gui(ThemedTk):
         removeButton.grid( row = 1 , column = 7 , sticky ="EW")
 
         self.choseProgramCombobox = ttk.Combobox( self.frame1 , values =  self.comboBoxList , text = "Choose a" + "\n" + "Program" , width = 10 )
-        self.choseProgramCombobox.grid( row = 2 , column = 6 , sticky = "SWE")
+        self.choseProgramCombobox.grid( row = 2 , column = 7 , sticky = "SWE")
         #choseProgramCombobox.bind('<<ComboboxSelected>>' , self.someFunction)
 
         initiateProgramButton = ttk.Button ( self.frame1 , text = "Start" + "\n" + "Program" , width = 10 , command = lambda : threading.Thread( target = self.initiateProgram).start())
