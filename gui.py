@@ -66,28 +66,28 @@ class Gui(ThemedTk):
         #self.database()
 
         label1 = ttk.Label( self.frame1 , text = "Program" + "\n" + "Number:")
-        label1.grid( row = 0 , column = 0 , sticky = "EW")
+        label1.grid( row = 0 , column = 0 , sticky = "E")
         programEntry = ttk.Entry(self.frame1 , width = 5)
-        programEntry.grid( row = 0 , column = 1 ,  sticky = "W" )
+        programEntry.grid( row = 0 , column = 1 ,  sticky = "EW" )
 
 
         label2 = ttk.Label(self.frame1 , text = "RPM:")
-        label2.grid( row = 0 , column = 2 ,  sticky = "EW")
+        label2.grid( row = 0 , column = 2 ,  sticky = "E")
         label3 = ttk.Label(self.frame1 , text = " Scale:")
-        label3.grid( row = 1 , column = 2 , sticky = "EW")
+        label3.grid( row = 1 , column = 2 , sticky = "E")
         rpmEntry = ttk.Entry(self.frame1 , width = 5)
-        rpmEntry.grid( row = 0 , column = 3 ,  sticky = "W")
+        rpmEntry.grid( row = 0 , column = 3 ,  sticky = "EW")
         self.rpmScale = Scale( self.frame1 , from_ = 0 , to = 100 , orient = HORIZONTAL , resolution = 5)
-        self.rpmScale.grid( row = 1 , column = 3 , sticky = "W")
+        self.rpmScale.grid( row = 1 , column = 3 , sticky = "EW")
 
         label4 = ttk.Label(self.frame1, text = "TIME(H):")
-        label4.grid ( row = 0 , column = 4,  sticky = "EW")
+        label4.grid ( row = 0 , column = 4,  sticky = "E")
         label4 = ttk.Label(self.frame1 , text = "Scale:")
-        label4.grid( row = 1 , column = 4 , sticky = "W")
+        label4.grid( row = 1 , column = 4 , sticky = "E")
         timeEntry = ttk.Entry(self.frame1 , width = 5)
         timeEntry.grid( row = 0  , column = 5 ,  sticky = "EW" )
         self.timeScale = Scale( self.frame1 , from_ = 0 , to = 100 , orient = HORIZONTAL , resolution = 1)
-        self.timeScale.grid( row = 1 , column = 5 , sticky = "W")
+        self.timeScale.grid( row = 1 , column = 5 , sticky = "EW")
 
         addButton = ttk.Button(self.frame1 , text = "Add" ,
                               command = lambda : self.submitData(rpmEntry , timeEntry , programEntry , self.rpmScale , self.timeScale))
