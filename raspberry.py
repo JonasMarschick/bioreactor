@@ -22,8 +22,6 @@ class RaspberryConfiguration():
 
         listOfIndexofPWMPin = ( 0 , 3 , 6 , 9 , 12)
         
-        self.printdic()
-
         for i in listOfIndexofPWMPin:
             for j in range(3):
                 
@@ -101,11 +99,6 @@ class RaspberryConfiguration():
 
         # Raspberry Pi 3 Pin Settings Completed
         
-    def printdic(self):
-        
-        print(self.dicSetup["MOTOR1A"])
-
-
     def motorClockwise( self , MOTORA , MOTORB):
         GPIO.output(MOTORA , GPIO.LOW)  # Motor will move in clockwise direction.
         GPIO.output(MOTORB, GPIO.HIGH)
