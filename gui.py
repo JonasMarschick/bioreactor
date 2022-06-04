@@ -377,7 +377,8 @@ class Gui(ThemedTk):
         interval =  int ((totalTime / 100)  * 1000) # time in seconds
 
         for row in fetch:
-
+            
+            print(row)
             #self.progressBar.start([interval])
             self.raspberry.changePWM(notebookSelectedTabNumber , row[1])
             time.sleep(row[2])
