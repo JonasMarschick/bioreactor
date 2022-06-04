@@ -19,6 +19,8 @@ class RaspberryConfiguration():
         GPIO.setmode(GPIO.BOARD) # We are accessing GPIOs according to their physical location
 
         listOfIndexofPWMPin = ( 0 , 3 , 6 , 9 , 12)
+        
+        self.printdic()
 
         for i in listOfIndexofPWMPin:
             for j in range(3):
@@ -96,6 +98,10 @@ class RaspberryConfiguration():
         '''
 
         # Raspberry Pi 3 Pin Settings Completed
+        
+    def printdic(self):
+        
+        print(self.dicSetup[2])
 
 
     def motorClockwise( self , MOTORA , MOTORB):
