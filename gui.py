@@ -8,7 +8,7 @@ import os
 import sqlite3
 from ttkthemes import ThemedTk
 import threading
-import raspberry
+#import raspberry
 import time
 
 
@@ -30,11 +30,12 @@ class Gui(ThemedTk):
         self.initGui()
         self.database()
         self.centerWindow()
-        self.resizable()
+        self.resizable(self.frame1)
+        self.resizable(self.actionButtonFrame)
         self.mode()
         self.set_theme(self.theme)
 
-        self.raspberry = raspberry.RaspberryConfiguration()
+        #self.raspberry = raspberry.RaspberryConfiguration()
 
 
     def initGui(self):
@@ -44,6 +45,7 @@ class Gui(ThemedTk):
 
         self.style = ttk.Style()
         self.title ("Spinfinity")
+        self.geometry("900x900")
         #self.style = ttk.Style()
        # print(self.style.theme_names()) #Gives an option of the themes that are available
         #self.style.theme_use("alt")
@@ -64,58 +66,58 @@ class Gui(ThemedTk):
         self.tree.heading("#0" , text = "Program Number")
         self.tree.heading("#1" , text = "RPM")
         self.tree.heading("#2" , text= "TIME")
-        self.tree.grid(row = 2 , column = 0  , rowspan = 5 , columnspan = 6 , sticky = "NSEW" )
+        self.tree.grid(row = 2 , column = 0  , rowspan = 4 , columnspan = 6 , sticky = "NSEW" )
         #self.database()
 
         label1 = ttk.Label( self.frame1 , text = ("Program" + "\n" + "Number") + ":")
-        label1.grid( row = 0 , column = 0 , sticky = "E")
+        label1.grid( row = 0 , column = 0 , sticky = "W")
         programEntry = ttk.Entry(self.frame1 , width = 5)
         programEntry.grid( row = 0 , column = 1 ,  sticky = "EW" )
 
 
         label2 = ttk.Label(self.frame1 , text = "RPM:")
-        label2.grid( row = 0 , column = 2 ,  sticky = "E")
+        label2.grid( row = 0 , column = 2 )
         label3 = ttk.Label(self.frame1 , text = " Scale:")
-        label3.grid( row = 1 , column = 2 , sticky = "E")
+        label3.grid( row = 1 , column = 2)
         rpmEntry = ttk.Entry(self.frame1 , width = 5)
         rpmEntry.grid( row = 0 , column = 3 ,  sticky = "EW")
         self.rpmScale = Scale( self.frame1 , from_ = 0 , to = 100 , orient = HORIZONTAL , resolution = 5)
         self.rpmScale.grid( row = 1 , column = 3 , sticky = "EW")
 
         label4 = ttk.Label(self.frame1, text = "TIME(H):")
-        label4.grid ( row = 0 , column = 4,  sticky = "E")
+        label4.grid ( row = 0 , column = 4)
         label4 = ttk.Label(self.frame1 , text = "Scale:")
-        label4.grid( row = 1 , column = 4 , sticky = "E")
+        label4.grid( row = 1 , column = 4 )
         timeEntry = ttk.Entry(self.frame1 , width = 5)
         timeEntry.grid( row = 0  , column = 5 ,  sticky = "EW" )
         self.timeScale = Scale( self.frame1 , from_ = 0 , to = 100 , orient = HORIZONTAL , resolution = 1)
         self.timeScale.grid( row = 1 , column = 5 , sticky = "EW")
 
-        addButton = ttk.Button(self.frame1 , text = "Add" ,
+        addButton = ttk.Button(self.frame1 , text = "Add"  , width = 5 ,
                               command = lambda : self.submitData(rpmEntry , timeEntry , programEntry , self.rpmScale , self.timeScale))
-        addButton.grid( row = 0  , column = 7 ,  sticky = "EW" , padx = 20 )
-
-        removeButton = ttk.Button( self.frame1 , text = "Remove" ,
+        addButton.grid( row = 0  , column = 6 ,  sticky = "EW" , padx = 20)
+        removeButton = ttk.Button( self.frame1 , text = "Remove", width = 5 ,
                                command = lambda : self.onRemove(self.tree.selection() , rpmEntry , timeEntry , programEntry , self.rpmScale , self.timeScale ))
-        removeButton.grid( row = 1 , column = 7 , sticky ="EW" , padx = 20 )
+        removeButton.grid( row = 1 , column = 6 , sticky ="EW" , padx = 20)
 
-        self.choseProgramCombobox = ttk.Combobox( self.frame1 , values =  self.comboBoxList , text = "Choose a" + "\n" + "Program" , width = 10 )
-        self.choseProgramCombobox.grid( row = 2 , column = 7 , sticky = "SWE" , padx = 20)
-        #choseProgramCombobox.bind('<<ComboboxSelected>>' , self.someFunction)
-
-        initiateProgramButton = ttk.Button ( self.frame1 , text = "Start" + "\n" + "Program" , width = 10 , command = lambda : threading.Thread( target = self.initiateProgram).start())
-        initiateProgramButton.grid ( row = 3 , column = 7 , sticky = "NWE" , padx = 20 )
-        terminateProgramButton = ttk.Button
-
+        self.actionButtonFrame = ttk.Frame(self.frame1  , width = 5 )
+        self.actionButtonFrame.grid(row = 3 , column = 6 , sticky = "EW" , padx = 20)
+        self.choseProgramCombobox = ttk.Combobox(self.actionButtonFrame, values=self.comboBoxList,  text="Choose a" + "\n" + "Program", width=5)
+        self.choseProgramCombobox.grid( row=0 , column=0 , columnspan = 2 ,  sticky="WE" )
+        # choseProgramCombobox.bind('<<ComboboxSelected>>' , self.someFunction)
+        initiateProgramButton = ttk.Button ( self.actionButtonFrame , text = "Start" + "\n" + "Program" , command = lambda : threading.Thread( target = self.initiateProgram).start())
+        initiateProgramButton.grid ( row = 1 , column = 0 , sticky = "EW")
+        terminateProgramButton = ttk.Button(self.actionButtonFrame , text = "Terminate" + "\n" + "Program" , command = self.terminateProgram)
+        terminateProgramButton.grid ( row = 1 , column = 1 , sticky = "EW")
         #self.style.configure(green.TProgressbar", foreground='green' , background = "black" , throughcolor = "black")
-        self.progressBar = ttk.Progressbar(self.frame1 , mode = "determinate") # style = "green.TProgressbar
-        self.progressBar.grid( row = 4 , column = 7 , sticky = "NWE" , pady = 0 , padx = 20 )
+        self.progressBar = ttk.Progressbar(self.actionButtonFrame , mode = "determinate") # style = "green.TProgressbar
+        self.progressBar.grid( row = 2 , column = 0 , columnspan = 2  ,  sticky = "NWE" , pady = 20)
 
-        exportButton = ttk.Button( self.frame1 , text = "Export as" "\n" + " CSV" , command = self.export , width = 10 )
-        exportButton.grid( row = 5 , column = 7 , sticky = "EW" , padx = 20 )
+        exportButton = ttk.Button( self.frame1 , text = "Export as" "\n" + " CSV" , command = self.export , width = 5 )
+        exportButton.grid( row = 4 , column = 6 , sticky = "EW" , padx = 20 )
 
-        modeButton = ttk.Button( self.frame1 , text = "Light/Dark" + "\n"  "mode" , command = self.mode , width = 10)
-        modeButton.grid(row = 6 , column = 7 , sticky = "EW" , padx = 20)
+        modeButton = ttk.Button( self.frame1 , text = "Light/Dark" + "\n"  "mode" , command = self.mode , width = 5)
+        modeButton.grid(row = 5 , column = 6 , sticky = "EW" , padx = 20)
 
 
     def onRemove(self , iids , rpmEntry , timeEntry , programEntry , rpmScale , timeScale):
@@ -249,17 +251,17 @@ class Gui(ThemedTk):
         self.geometry('%dx%d' % (width , heigth))
 
 
-    def resizable(self):
+    def resizable(self , frame):
 
-        tuple = self.frame1.grid_size()
+        tuple = frame.grid_size()
 
         for i in range(tuple[0]):
 
-            self.frame1.columnconfigure( i , weight = 1 , minsize = 2)
+            frame.columnconfigure( i , weight = 1 , minsize = 2)
 
         for i in range(tuple[1]):
 
-            self.frame1.rowconfigure( i , weight = 1 , minsize = 2 )
+            frame.rowconfigure( i , weight = 1 , minsize = 2 )
 
 
     def database(self):
@@ -430,6 +432,16 @@ class Gui(ThemedTk):
         if ( not len(self.comboBoxList) == 0):
 
             self.choseProgramCombobox.current([0])
+
+    def terminateProgram(self):
+
+        MOTORA = self.raspberry.dicSetup["MOTOR" + str(notebookSelectedTabNumber) + "A"]
+        MOTORB = self.raspberry.dicSetup["MOTOR" + str(notebookSelectedTabNumber) + "B"]
+        self.raspberry.motorStop(MOTORA, MOTORB)
+
+        self.threadAlive = False
+
+
 
     def disable_event( self):
 
