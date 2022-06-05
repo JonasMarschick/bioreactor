@@ -385,7 +385,7 @@ class Gui(ThemedTk):
            
         self.progressBar.stop()
 
-        self.raspberry.motorStop(MOTORA , MOTORB)
+        self.raspberry.motorStop(MOTORA , MOTORB) #ll
 
         tkMessageBox.showinfo("Program finished",  "The program is finished!") ### fuehrt zu problemen wen das Gui vom user derminated wird, bevor das Program fertig ist
 
