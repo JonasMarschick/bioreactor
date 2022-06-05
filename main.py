@@ -1,13 +1,13 @@
 # ich esse gerne chicken wings
 # ich esse geren steak
+# ich bin sowas von verwirrt
+
 import gui
+import tkinter.messagebox as tkMessageBox
 
 
-if __name__ == "__main__":
+root = gui.Gui()
 
-    print("heypp")
-
-    root = gui.Gui()
-    root.mainloop()
+root.mainloop()
 
 

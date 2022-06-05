@@ -25,6 +25,7 @@ class Gui(ThemedTk):
         self.comboBoxList = []
         self.programNumberList = []
         self.uniqueProgramNumberList = []
+        self.threadAlive = False
 
         self.initGui()
         self.database()
@@ -38,9 +39,10 @@ class Gui(ThemedTk):
 
     def initGui(self):
 
+        self.protocol("WM_DELETE_WINDOW", lambda arg = self.threadAlive : self.disable_event(arg))
+
 
         self.style = ttk.Style()
-
         self.title ("Spinfinity")
         #self.style = ttk.Style()
        # print(self.style.theme_names()) #Gives an option of the themes that are available
@@ -355,6 +357,8 @@ class Gui(ThemedTk):
 
     def initiateProgram(self):
 
+        self.threadAlive = True
+
         totalTime = 0
         interval = 0
 
@@ -388,6 +392,8 @@ class Gui(ThemedTk):
         self.raspberry.motorStop(MOTORA , MOTORB) #ll
 
         tkMessageBox.showinfo("Program finished",  "The program is finished!") ### fuehrt zu problemen wen das Gui vom user derminated wird, bevor das Program fertig ist
+
+        self.threadAlive = False
 
     def getProgramNumber(self):
 
@@ -424,6 +430,18 @@ class Gui(ThemedTk):
 
             self.choseProgramCombobox.current([0])
 
+    def disable_event( self , bol):
+
+        if ( bol):
+
+            tkMessageBox.showinfo("Warning!",
+                                  "You can not close the gui before:" + "\n" + "\n" +
+                                  "1) The program is finished " + "\n" + "\n" +
+                                  "2) The program is terminated via the button 'Terminate'")
+
+        else:
+
+            self.destroy()
 
 if __name__ == "__main__":
 
