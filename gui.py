@@ -39,7 +39,7 @@ class Gui(ThemedTk):
 
     def initGui(self):
 
-        self.protocol("WM_DELETE_WINDOW", lambda arg = self.threadAlive : self.disable_event(arg))
+        self.protocol("WM_DELETE_WINDOW", self.disable_event)
 
 
         self.style = ttk.Style()
@@ -105,6 +105,7 @@ class Gui(ThemedTk):
 
         initiateProgramButton = ttk.Button ( self.frame1 , text = "Start" + "\n" + "Program" , width = 10 , command = lambda : threading.Thread( target = self.initiateProgram).start())
         initiateProgramButton.grid ( row = 3 , column = 7 , sticky = "NWE" , padx = 20 )
+        terminateProgramButton = ttk.Button
 
         #self.style.configure(green.TProgressbar", foreground='green' , background = "black" , throughcolor = "black")
         self.progressBar = ttk.Progressbar(self.frame1 , mode = "determinate") # style = "green.TProgressbar
@@ -430,9 +431,9 @@ class Gui(ThemedTk):
 
             self.choseProgramCombobox.current([0])
 
-    def disable_event( self , bol):
+    def disable_event( self):
 
-        if ( bol):
+        if ( self.threadAlive):
 
             tkMessageBox.showinfo("Warning!",
                                   "You can not close the gui before:" + "\n" + "\n" +
