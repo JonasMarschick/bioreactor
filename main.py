@@ -1,4 +1,5 @@
 # ich esse gerne chicken wings
+# ich esse geren steak
 import gui
 
 

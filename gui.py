@@ -8,7 +8,7 @@ import os
 import sqlite3
 from ttkthemes import ThemedTk
 import threading
-import raspberry
+#import raspberry
 import time
 
 
@@ -33,7 +33,7 @@ class Gui(ThemedTk):
         self.mode()
         self.set_theme(self.theme)
 
-        self.raspberry = raspberry.RaspberryConfiguration()
+        #self.raspberry = raspberry.RaspberryConfiguration()
 
 
     def initGui(self):
@@ -387,7 +387,7 @@ class Gui(ThemedTk):
 
         self.raspberry.motorStop(MOTORA , MOTORB)
 
-       # tkMessageBox.showinfo("Program finished",  "The program is finished!") ### führt zu problemen wen das Gui vom user derminated wird, bevor das Program fertig ist
+       # tkMessageBox.showinfo("Program finished",  "The program is finished!") ### fuehrt zu problemen wen das Gui vom user derminated wird, bevor das Program fertig ist
 
     def getProgramNumber(self):
 
