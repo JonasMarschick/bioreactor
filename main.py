@@ -1,3 +1,4 @@
+# ich esse gerne chicken wings
 import gui
 
 
