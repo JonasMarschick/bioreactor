@@ -105,7 +105,7 @@ class Gui(ThemedTk):
         self.choseProgramCombobox = ttk.Combobox(self.actionButtonFrame, values=self.comboBoxList,  text="Choose a" + "\n" + "Program", width=5)
         self.choseProgramCombobox.grid( row=0 , column=0 , columnspan = 2 ,  sticky="WE" )
         # choseProgramCombobox.bind('<<ComboboxSelected>>' , self.someFunction)
-        initiateProgramButton = ttk.Button ( self.actionButtonFrame , text = "Start" + "\n" + "Program" , command = lambda : threading.Thread( target = self.initiateProgram).start())
+        initiateProgramButton = ttk.Button ( self.actionButtonFrame , text = "Start" + "\n" + "Program" , command = lambda : self.initiateProgram)
         initiateProgramButton.grid ( row = 1 , column = 0 , sticky = "EW")
         terminateProgramButton = ttk.Button(self.actionButtonFrame , text = "Terminate" + "\n" + "Program" , command = self.terminateProgram)
         terminateProgramButton.grid ( row = 1 , column = 1 , sticky = "EW")
@@ -362,39 +362,45 @@ class Gui(ThemedTk):
 
         self.threadAlive = True
 
-        totalTime = 0
-        interval = 0
+        def startProgram():
 
-        notebookSelectedTabNumber = self.getNotebookSelectedTabNumber()
-        MOTORA = self.raspberry.dicSetup["MOTOR" + str(notebookSelectedTabNumber) + "A"]
-        MOTORB = self.raspberry.dicSetup["MOTOR" + str(notebookSelectedTabNumber) + "B"]
-        self.raspberry.motorClockwise( MOTORA , MOTORB)
+            totalTime = 0
+            interval = 0
 
-        conn = sqlite3.connect("programs.db")
-        cursor = conn.cursor()
-        programNumber = self.getProgramNumber()
-        cursor.execute(" SELECT *, oid FROM program WHERE programNumber = ?" , (programNumber,))
-        fetch = cursor.fetchall()
+            notebookSelectedTabNumber = self.getNotebookSelectedTabNumber()
+            MOTORA = self.raspberry.dicSetup["MOTOR" + str(notebookSelectedTabNumber) + "A"]
+            MOTORB = self.raspberry.dicSetup["MOTOR" + str(notebookSelectedTabNumber) + "B"]
+            self.raspberry.motorClockwise( MOTORA , MOTORB)
 
-        for row in fetch:
+            conn = sqlite3.connect("programs.db")
+            cursor = conn.cursor()
+            programNumber = self.getProgramNumber()
+            cursor.execute(" SELECT *, oid FROM program WHERE programNumber = ?" , (programNumber,))
+            fetch = cursor.fetchall()
 
-            totalTime += row[2]
+            for row in fetch:
 
-        #interval = (totalTime / 100)  * 60 * 60 * 1000 # time in hours
-        interval =  int ((totalTime / 100)  * 1000) # time in seconds
+                totalTime += row[2]
 
-        for row in fetch:
-            
-            print(row)
+            #interval = (totalTime / 100)  * 60 * 60 * 1000 # time in hours
+            interval =  int ((totalTime / 100)  * 1000) # time in seconds
             self.progressBar.start([interval])
-            self.raspberry.changePWM(notebookSelectedTabNumber , row[1])
-            time.sleep(row[2])
-           
-        self.progressBar.stop()
 
-        self.raspberry.motorStop(MOTORA , MOTORB) #ll
+            for row in fetch:
 
-        tkMessageBox.showinfo("Program finished",  "The program is finished!") ### fuehrt zu problemen wen das Gui vom user derminated wird, bevor das Program fertig ist
+                self.raspberry.changePWM(notebookSelectedTabNumber , row[1])
+                time.sleep(row[2])
+
+            self.progressBar.stop()
+
+            self.raspberry.motorStop(MOTORA , MOTORB) #ll
+
+            tkMessageBox.showinfo("Program finished",  "The program is finished!") ### fuehrt zu problemen wen das Gui vom user derminated wird, bevor das Program fertig ist
+
+
+        self.thread = threading.Thread( target = startProgram)
+        self.thread.start()
+
 
         self.threadAlive = False
 
