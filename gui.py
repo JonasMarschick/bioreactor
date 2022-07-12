@@ -1,4 +1,5 @@
-from tkinter import*
+#from tkinter import*
+import tkinter as tk
 import tkinter.ttk as ttk
 import tkinter.messagebox as tkMessageBox
 import tkinter.filedialog as filedialog
@@ -11,6 +12,7 @@ import threading
 #import raspberry
 import time
 
+string = ""
 
 class Gui(ThemedTk):
 
@@ -37,22 +39,20 @@ class Gui(ThemedTk):
 
         #self.raspberry = raspberry.RaspberryConfiguration()
 
-
     def initGui(self):
 
         self.protocol("WM_DELETE_WINDOW", self.disable_event)
 
-
+        #self.geometry("500x500")
+        self.minsize(700 , 400)
         self.style = ttk.Style()
         self.title ("Spinfinity")
-        self.geometry("900x900")
         #self.style = ttk.Style()
        # print(self.style.theme_names()) #Gives an option of the themes that are available
         #self.style.theme_use("alt")
 
         self.notebook = ttk.Notebook(self)
         self.notebook.pack(expand = 1  , fill = "both")
-        #print(self.notebook.get_themes())
 
         self.frame1 = ttk.Frame(self.notebook)
        # self.frame1.config( bg = "azure")
@@ -71,33 +71,36 @@ class Gui(ThemedTk):
 
         label1 = ttk.Label( self.frame1 , text = ("Program" + "\n" + "Number") + ":")
         label1.grid( row = 0 , column = 0 , sticky = "W")
-        programEntry = ttk.Entry(self.frame1 , width = 5)
-        programEntry.grid( row = 0 , column = 1 ,  sticky = "EW" )
+        self.programEntry = ttk.Entry(self.frame1 , width = 5)
+        self.programEntry.grid( row = 0 , column = 1 ,  sticky = "EW" )
+        self.programEntry.bind("<1>" , self.handleClickProgramEntry)
 
 
         label2 = ttk.Label(self.frame1 , text = "RPM:")
         label2.grid( row = 0 , column = 2 )
         label3 = ttk.Label(self.frame1 , text = " Scale:")
         label3.grid( row = 1 , column = 2)
-        rpmEntry = ttk.Entry(self.frame1 , width = 5)
-        rpmEntry.grid( row = 0 , column = 3 ,  sticky = "EW")
-        self.rpmScale = Scale( self.frame1 , from_ = 0 , to = 100 , orient = HORIZONTAL , resolution = 5)
+        self.rpmEntry = ttk.Entry(self.frame1 , width = 5)
+        self.rpmEntry.grid( row = 0 , column = 3 ,  sticky = "EW")
+        self.rpmEntry.bind("<1>" , self.handleClickRpmEntry)
+        self.rpmScale = tk.Scale( self.frame1 , from_ = 0 , to = 100 , orient = tk.HORIZONTAL , resolution = 5)
         self.rpmScale.grid( row = 1 , column = 3 , sticky = "EW")
 
         label4 = ttk.Label(self.frame1, text = "TIME(H):")
         label4.grid ( row = 0 , column = 4)
         label4 = ttk.Label(self.frame1 , text = "Scale:")
         label4.grid( row = 1 , column = 4 )
-        timeEntry = ttk.Entry(self.frame1 , width = 5)
-        timeEntry.grid( row = 0  , column = 5 ,  sticky = "EW" )
-        self.timeScale = Scale( self.frame1 , from_ = 0 , to = 100 , orient = HORIZONTAL , resolution = 1)
+        self.timeEntry = ttk.Entry(self.frame1 , width = 5)
+        self.timeEntry.grid( row = 0  , column = 5 ,  sticky = "EW" )
+        self.timeEntry.bind("<1>" , self.handleClickTimeEntry)
+        self.timeScale = tk.Scale( self.frame1 , from_ = 0 , to = 100 , orient = tk.HORIZONTAL , resolution = 1)
         self.timeScale.grid( row = 1 , column = 5 , sticky = "EW")
 
         addButton = ttk.Button(self.frame1 , text = "Add"  , width = 5 ,
-                              command = lambda : self.submitData(rpmEntry , timeEntry , programEntry , self.rpmScale , self.timeScale))
+                              command = lambda : self.submitData(self.rpmEntry , self.timeEntry , self.programEntry , self.rpmScale , self.timeScale))
         addButton.grid( row = 0  , column = 6 ,  sticky = "EW" , padx = 20)
         removeButton = ttk.Button( self.frame1 , text = "Remove", width = 5 ,
-                               command = lambda : self.onRemove(self.tree.selection() , rpmEntry , timeEntry , programEntry , self.rpmScale , self.timeScale ))
+                               command = lambda : self.onRemove(self.tree.selection() , self.rpmEntry , self.timeEntry , self.programEntry , self.rpmScale , self.timeScale ))
         removeButton.grid( row = 1 , column = 6 , sticky ="EW" , padx = 20)
 
         self.actionButtonFrame = ttk.Frame(self.frame1  , width = 5 )
@@ -461,6 +464,130 @@ class Gui(ThemedTk):
         else:
 
             self.destroy()
+
+    def handleClickProgramEntry(self , event):
+
+        self.programEntry.delete(0 , tk.END)
+        global string
+        string = ""
+        topLevel = GuiNumberField()
+        topLevel.wait_window()
+        self.programEntry.insert( 0  , string)
+
+    def handleClickRpmEntry(self , event):
+
+        self.rpmEntry.delete(0 , tk.END)
+        global string
+        string = ""
+        topLevel = GuiNumberField()
+        topLevel.wait_window()
+        self.rpmEntry.insert( 0  , string)
+
+    def handleClickTimeEntry(self , event):
+
+        self.timeEntry.delete(0 , tk.END)
+        global string
+        string = ""
+        topLevel = GuiNumberField()
+        topLevel.wait_window()
+        self.timeEntry.insert( 0  , string)
+
+
+class GuiNumberField(tk.Toplevel):  # ThemedTk
+
+    def __init__(self):
+
+       # ThemedTk.__init__(self)
+        tk.Toplevel.__init__(self)
+
+        self.title("Number Entry")
+        self.geometry("400x400")
+        self.frame = ttk.Frame(self)
+        self.frame.pack(fill="both", expand=True)
+
+        self.initGui()
+        self.generateButtons()
+        self.resizable(self.frame) # This function should always be initiliazed last, as if not the gui isn't scalable. Try swapping line 17 and 18 and look what happens
+
+    def initGui(self):
+
+        self.Entry = ttk.Entry(self.frame , width = "5"  , justify = tk.CENTER , font = ( None , 50 , "bold")) #, font = tkfont.Font( family = "Helvetica" , size = 36 , weigth = "bold"))
+        self.Entry.grid( row = 0 , column = 0 , columnspan = 2 , rowspan = 2 , sticky = "NESW")
+
+        enterButton = ttk.Button(self.frame , text = "Enter" , command = lambda : self.enterEntry())
+        enterButton.grid( row = 0 , column = 2 , sticky = "NESW")
+        deleteButton = ttk.Button(self.frame , text = "Delete" , command = lambda : self.deleteEntry())
+        deleteButton.grid( row = 1 , column = 2 , sticky = "NESW")
+
+    def generateButtons(self):
+
+        rows = [ 2 , 3 , 4 , 5 ]
+        columns = [ 0 , 1 , 2]
+        number = 1
+
+        for r in rows:
+            for c in columns:
+
+                if r == 5:
+
+                    addButton = ttk.Button(self.frame , text = "0" , command = lambda : self.submitData("0"))
+                    addButton.grid( row = 5 , column = 0 , sticky = "NESW")
+
+                else:
+
+                    addButton = ttk.Button(self.frame , text = str(number) , command = lambda number = number : self.submitData( str(number) ))
+                    addButton.grid( row = r , column = c , sticky = "NESW")
+
+                number += 1
+
+
+    def resizable(self , frame):
+
+        tuple = frame.grid_size()
+
+        for i in range(tuple[0]):
+
+            frame.columnconfigure( i , weight = 1 , minsize = 2)
+
+        for i in range(tuple[1]):
+
+            frame.rowconfigure( i , weight = 1 , minsize = 2 )
+
+    def submitData(self , text):
+
+        self.Entry.delete(0 , tk.END)
+        global  string
+
+        if len(string) < 4:
+            string += text
+
+        else:
+            pass
+
+        self.Entry.insert(0, string)
+
+    def deleteEntry(self):
+
+        self.Entry.delete(0)
+
+    def enterEntry(self):
+
+        global string
+
+        if string != "":
+
+            self.Entry.delete(0)
+            self.destroy()
+
+        else:
+
+            pass
+
+    def getString(self):
+
+        global string
+        return string
+
 
 if __name__ == "__main__":
 
