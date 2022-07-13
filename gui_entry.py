@@ -67,7 +67,7 @@ class GuiNumberField(ThemedTk):
 
     def deleteEntry(self):
 
-        self.Entry.delete(0)
+        self.Entry.delete(-1)
 
 
     def enterEntry(self):

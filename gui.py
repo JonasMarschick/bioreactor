@@ -11,6 +11,7 @@ from ttkthemes import ThemedTk
 import threading
 #import raspberry
 import time
+from PIL import ImageTk, Image
 
 string = ""
 
@@ -22,12 +23,15 @@ class Gui(ThemedTk):
 
         self.choseProgram = ""
         self.count = 0
+        self.count2 = 0 # has something to do with the standard unit of time, if it is in seconds or in hours
         self.theme = ""
         self.mydata = []
         self.comboBoxList = []
         self.programNumberList = []
         self.uniqueProgramNumberList = []
         self.threadAlive = False
+        self.timeMode = 60 * 60
+        self.timeModeList = (60 * 60 , 1 , "H" , "Sec") # normally a program should run for x hours, but for testing purposes it is more convenient to change the standard time to seconds
 
         self.initGui()
         self.database()
@@ -44,7 +48,7 @@ class Gui(ThemedTk):
         self.protocol("WM_DELETE_WINDOW", self.disable_event)
 
         #self.geometry("500x500")
-        self.minsize(700 , 400)
+        self.minsize(800 , 500)
         self.style = ttk.Style()
         self.title ("Spinfinity")
         #self.style = ttk.Style()
@@ -64,8 +68,8 @@ class Gui(ThemedTk):
 
         self.tree = ttk.Treeview( self.frame1 , columns = ("RPM" , "time") , selectmode = "extended")
         self.tree.heading("#0" , text = "Program Number")
-        self.tree.heading("#1" , text = "RPM")
-        self.tree.heading("#2" , text= "TIME")
+        self.tree.heading("#1" , text = "RPM(MIN\u207B\u00B9):")
+        self.tree.heading("#2" , text= "TIME(H)")
         self.tree.grid(row = 2 , column = 0  , rowspan = 4 , columnspan = 6 , sticky = "NSEW" )
         #self.database()
 
@@ -76,7 +80,7 @@ class Gui(ThemedTk):
         self.programEntry.bind("<1>" , self.handleClickProgramEntry)
 
 
-        label2 = ttk.Label(self.frame1 , text = "RPM:")
+        label2 = ttk.Label(self.frame1 , text = "RPM(MIN\u207B\u00B9):")
         label2.grid( row = 0 , column = 2 )
         label3 = ttk.Label(self.frame1 , text = " Scale:")
         label3.grid( row = 1 , column = 2)
@@ -86,10 +90,10 @@ class Gui(ThemedTk):
         self.rpmScale = tk.Scale( self.frame1 , from_ = 0 , to = 100 , orient = tk.HORIZONTAL , resolution = 5)
         self.rpmScale.grid( row = 1 , column = 3 , sticky = "EW")
 
-        label4 = ttk.Label(self.frame1, text = "TIME(H):")
-        label4.grid ( row = 0 , column = 4)
-        label4 = ttk.Label(self.frame1 , text = "Scale:")
-        label4.grid( row = 1 , column = 4 )
+        self.label4 = ttk.Label(self.frame1, text = "TIME(H):")
+        self.label4.grid ( row = 0 , column = 4)
+        label5 = ttk.Label(self.frame1 , text = "Scale:")
+        label5.grid( row = 1 , column = 4 )
         self.timeEntry = ttk.Entry(self.frame1 , width = 5)
         self.timeEntry.grid( row = 0  , column = 5 ,  sticky = "EW" )
         self.timeEntry.bind("<1>" , self.handleClickTimeEntry)
@@ -137,14 +141,31 @@ class Gui(ThemedTk):
 
         if (val0 == "" or val1 == "" or val2 == ""):
 
-            for iid in iids:
+            string = str(iids[0])
 
-                dicValues = self.tree.item(iid)
-                parentIid = self.tree.parent(iid)
-                cursor.execute( sqlDeleteCondition , (parentIid, dicValues["values"][0] , dicValues["values"][1]))
+            if ( string.isdigit()):
+
+                cursor.execute(" SELECT *, oid FROM program WHERE programNumber = ?", (iids[0],))
                 conn.commit()
+                fetch = cursor.fetchall()
 
-                self.tree.delete(iid)
+                for data in fetch:
+
+                    cursor.execute( sqlDeleteCondition , data[0:3])
+                    conn.commit()
+
+                self.tree.delete(iids)
+
+            else:
+
+                for iid in iids:
+
+                    dicValues = self.tree.item(iid)
+                    parentIid = self.tree.parent(iid)
+                    cursor.execute( sqlDeleteCondition , (parentIid, dicValues["values"][0] , dicValues["values"][1]))
+                    conn.commit()
+
+                    self.tree.delete(iid)
 
         elif (not val0 == "" and not val1 == "" and not val2 == ""):
 
@@ -169,7 +190,33 @@ class Gui(ThemedTk):
 
         if ( val3 == 0 and val4 == 0):
 
-            if ( len(val1) == 0 or len(val2) == 0 or len(val0) == 0): # checks if the input of the entry buttons is valid
+            if ( len(val1) == 0 or len(val2) == 0 or len(val0) == 0): # checks if all the necessary information to generate a new program subset is given
+
+                tkMessageBox.showerror(title="WARNING", message="Please enter a program number , RPM and TIME value so that a new program subset can be created")
+
+                return
+
+            if ( val0 == "999" and val1 == "999" and val2 == "999"): # this is a quick fix to change the time from h to min, for testing purposes of the bioreactor
+
+                i = 0
+
+                if (self.count2 % 2 == 0):
+
+                    i = 1
+
+                else:
+
+                    i = 0
+
+                self.count2 += 1
+                self.timeMode = self.timeModeList[i]
+
+                self.tree.heading("#2", text= ("TIME(%(1)s)") % {"1" : self.timeModeList[ i + 2]})
+                self.label4["text"] = ("TIME(%(1)s)") % {"1" : self.timeModeList[ i + 2]}
+
+                tkMessageBox.showerror(title="WARNING",  message=( ("The standard measure of time has been changed to %(1)d seconds")  % {"1" : self.timeMode} ))
+
+                self.easterEgg()
 
                 return
 
@@ -196,15 +243,28 @@ class Gui(ThemedTk):
 
             self.tree.insert(val0 , index = "end" , values = (fetch[-1][1], fetch[-1][2]))
 
-            programEntry.delete( 0 , "end")
+          #  programEntry.delete( 0 , "end")   # i find it anoying to always enter the program number again, if a new program is created, it will probably contain at least 2 rows of information
             rpmEntry.delete( 0 , "end")
             timeEntry.delete( 0  , "end")
 
         elif ( not val3 == 0 and not val4 == 0):
 
-            if (len(val0) == 0): # checks if the input of the entry buttons is valid
+
+            if (len(val0) == 0 ): #  checks if a program  number is given
+
+                tkMessageBox.showerror(title="WARNING", message="Please chose a program number, to which the RPM and TIME values "
+                                       "should be added!")
 
                 return
+
+            if (not len(val1) == 0 or  not len(val2) == 0):
+
+                if ( val1 != val3 or val2 != val4):
+
+                    tkMessageBox.showerror(title="WARNING",  message="Please make sure that the number you entered for the parameter TIME or RPM matches the"
+                                           " value selected with the corresponding scale")
+
+                    return
 
             bol = self.tree.exists(val0)
             if (not bol):
@@ -229,13 +289,14 @@ class Gui(ThemedTk):
 
             self.tree.insert(val0, index="end", values=(fetch[-1][1], fetch[-1][2]))
 
-            programEntry.delete(0, "end")
+            #programEntry.delete(0, "end")
             rpmEntry.delete(0, "end")
             timeEntry.delete(0, "end")
 
         else:
 
-            tkMessageBox.showerror( title = "WARNING" , message = "Please make sure that the value you selected with the RPM or TIME scale matches the value entered in the RPM or Time entry box")
+            tkMessageBox.showerror( title = "WARNING" , message = "Please make sure that the value you selected with the"
+                                                                  " RPM or TIME scale matches the value entered in the RPM or Time entry box")
 
 
     def addNewProgram(self, val0 ):
@@ -345,7 +406,7 @@ class Gui(ThemedTk):
 
         i = 0
 
-        if ( self.count % 2 == 0):
+        if (self.count % 2 == 0):
 
             i = 0
 
@@ -384,14 +445,13 @@ class Gui(ThemedTk):
 
             totalTime += row[2]
 
-        #interval = (totalTime / 100)  * 60 * 60 * 1000 # time in hours
-        interval =  int ((totalTime / 100)  * 1000) # time in seconds
+        interval =  int ((totalTime / 100)  * self.timeMode * 1000) # the * 1000 is necessary as the prograssbar measures everythin in miliseconds and not seconds
         self.progressBar.start([interval])
 
         for row in fetch:
 
             self.raspberry.changePWM(notebookSelectedTabNumber , row[1])
-            time.sleep(row[2])
+            time.sleep(row[2] * self.timeMode)
 
         self.progressBar.stop()
 
@@ -491,6 +551,17 @@ class Gui(ThemedTk):
         topLevel.wait_window()
         self.timeEntry.insert( 0  , string)
 
+    def easterEgg(self):
+
+        global my_img
+        top = tk.Toplevel()
+        top.title("never ever gonna give you up ...")
+        top.geometry( "250x250" )
+        my_img = ImageTk.PhotoImage(Image.open( "/Users/jonasmarschick/Desktop/easterEgg.png"))
+        tk.Label(top, image=my_img).pack()
+
+
+
 
 class GuiNumberField(tk.Toplevel):  # ThemedTk
 
@@ -567,7 +638,9 @@ class GuiNumberField(tk.Toplevel):  # ThemedTk
 
     def deleteEntry(self):
 
-        self.Entry.delete(0)
+        global string
+        string = ""
+        self.Entry.delete(0 , "end")
 
     def enterEntry(self):
 
