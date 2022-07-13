@@ -365,40 +365,39 @@ class Gui(ThemedTk):
 
         self.threadAlive = True
 
-        def startProgram():
 
-            totalTime = 0
-            interval = 0
+        totalTime = 0
+        interval = 0
 
-            notebookSelectedTabNumber = self.getNotebookSelectedTabNumber()
-            MOTORA = self.raspberry.dicSetup["MOTOR" + str(notebookSelectedTabNumber) + "A"]
-            MOTORB = self.raspberry.dicSetup["MOTOR" + str(notebookSelectedTabNumber) + "B"]
-            self.raspberry.motorClockwise( MOTORA , MOTORB)
+        notebookSelectedTabNumber = self.getNotebookSelectedTabNumber()
+        MOTORA = self.raspberry.dicSetup["MOTOR" + str(notebookSelectedTabNumber) + "A"]
+        MOTORB = self.raspberry.dicSetup["MOTOR" + str(notebookSelectedTabNumber) + "B"]
+        self.raspberry.motorClockwise( MOTORA , MOTORB)
 
-            conn = sqlite3.connect("programs.db")
-            cursor = conn.cursor()
-            programNumber = self.getProgramNumber()
-            cursor.execute(" SELECT *, oid FROM program WHERE programNumber = ?" , (programNumber,))
-            fetch = cursor.fetchall()
+        conn = sqlite3.connect("programs.db")
+        cursor = conn.cursor()
+        programNumber = self.getProgramNumber()
+        cursor.execute(" SELECT *, oid FROM program WHERE programNumber = ?" , (programNumber,))
+        fetch = cursor.fetchall()
 
-            for row in fetch:
+        for row in fetch:
 
-                totalTime += row[2]
+            totalTime += row[2]
 
-            #interval = (totalTime / 100)  * 60 * 60 * 1000 # time in hours
-            interval =  int ((totalTime / 100)  * 1000) # time in seconds
-            self.progressBar.start([interval])
+        #interval = (totalTime / 100)  * 60 * 60 * 1000 # time in hours
+        interval =  int ((totalTime / 100)  * 1000) # time in seconds
+        self.progressBar.start([interval])
 
-            for row in fetch:
+        for row in fetch:
 
-                self.raspberry.changePWM(notebookSelectedTabNumber , row[1])
-                time.sleep(row[2])
+            self.raspberry.changePWM(notebookSelectedTabNumber , row[1])
+            time.sleep(row[2])
 
-            self.progressBar.stop()
+        self.progressBar.stop()
 
-            self.raspberry.motorStop(MOTORA , MOTORB) #ll
+        self.raspberry.motorStop(MOTORA , MOTORB) #ll
 
-            tkMessageBox.showinfo("Program finished",  "The program is finished!") ### fuehrt zu problemen wen das Gui vom user derminated wird, bevor das Program fertig ist
+        tkMessageBox.showinfo("Program finished",  "The program is finished!") ### fuehrt zu problemen wen das Gui vom user derminated wird, bevor das Program fertig ist
 
 
         self.thread = threading.Thread( target = startProgram)
