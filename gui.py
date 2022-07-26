@@ -12,6 +12,7 @@ import threading
 #import raspberry
 import time
 from PIL import ImageTk, Image
+import multiprocessing
 
 string = ""
 
@@ -27,20 +28,24 @@ class Gui(ThemedTk):
         self.theme = ""
         self.mydata = []
         self.comboBoxList = []
+        self.comboBoxList2 = ["H" , "S" , "M"]
         self.programNumberList = []
         self.uniqueProgramNumberList = []
         self.threadAlive = False
         self.timeMode = 60 * 60
         self.timeModeList = (60 * 60 , 1 , "H" , "Sec") # normally a program should run for x hours, but for testing purposes it is more convenient to change the standard time to seconds
+        self.iid = None
+        self.fetch = None
 
         self.initGui()
         self.database()
         self.centerWindow()
         self.resizable(self.frame1)
         self.resizable(self.actionButtonFrame)
+        self.resizable(self.dataframeButtonFrame)
+        self.resizable(self.programEntryFrame)
         self.mode()
         self.set_theme(self.theme)
-
         #self.raspberry = raspberry.RaspberryConfiguration()
 
     def initGui(self):
@@ -69,46 +74,54 @@ class Gui(ThemedTk):
         self.tree = ttk.Treeview( self.frame1 , columns = ("RPM" , "time") , selectmode = "extended")
         self.tree.heading("#0" , text = "Program Number")
         self.tree.heading("#1" , text = "RPM(MIN\u207B\u00B9):")
-        self.tree.heading("#2" , text= "TIME(H)")
-        self.tree.grid(row = 2 , column = 0  , rowspan = 4 , columnspan = 6 , sticky = "NSEW" )
-        #self.database()
+        self.tree.heading("#2" , text= "TIME:")
+        self.tree.grid(row = 2 , column = 0  , rowspan = 3 , columnspan = 7 , sticky = "NSEW" )
+        self.tree.bind("<Double-1>" , self.updateRecord) # <<Double-1>> somehow doesnt work
 
-        label1 = ttk.Label( self.frame1 , text = ("Program" + "\n" + "Number") + ":")
+
+        self.programEntryFrame = ttk.Frame(self.frame1)
+        self.programEntryFrame.grid( row = 0 , column = 0 , rowspan = 2 , columnspan = 6 , sticky = "NESW")
+        label1 = ttk.Label( self.programEntryFrame , text = ("Program" + "\n" + "Number") + ":")
         label1.grid( row = 0 , column = 0 , sticky = "W")
-        self.programEntry = ttk.Entry(self.frame1 , width = 5)
+        self.programEntry = ttk.Entry(self.programEntryFrame , width = 5)
         self.programEntry.grid( row = 0 , column = 1 ,  sticky = "EW" )
         self.programEntry.bind("<1>" , self.handleClickProgramEntry)
-
-
-        label2 = ttk.Label(self.frame1 , text = "RPM(MIN\u207B\u00B9):")
+        label2 = ttk.Label(self.programEntryFrame , text = "RPM(MIN\u207B\u00B9):")
         label2.grid( row = 0 , column = 2 )
-        label3 = ttk.Label(self.frame1 , text = " Scale:")
+        label3 = ttk.Label(self.programEntryFrame , text = " Scale:")
         label3.grid( row = 1 , column = 2)
-        self.rpmEntry = ttk.Entry(self.frame1 , width = 5)
+        self.rpmEntry = ttk.Entry(self.programEntryFrame , width = 5)
         self.rpmEntry.grid( row = 0 , column = 3 ,  sticky = "EW")
         self.rpmEntry.bind("<1>" , self.handleClickRpmEntry)
-        self.rpmScale = tk.Scale( self.frame1 , from_ = 0 , to = 100 , orient = tk.HORIZONTAL , resolution = 5)
+        self.rpmScale = tk.Scale( self.programEntryFrame , from_ = 0 , to = 100 , orient = tk.HORIZONTAL , resolution = 5)
         self.rpmScale.grid( row = 1 , column = 3 , sticky = "EW")
-
-        self.label4 = ttk.Label(self.frame1, text = "TIME(H):")
-        self.label4.grid ( row = 0 , column = 4)
-        label5 = ttk.Label(self.frame1 , text = "Scale:")
+        self.label4 = ttk.Label(self.programEntryFrame, text = "TIME:")
+        self.label4.grid ( row = 0 , column = 4 )
+        label5 = ttk.Label(self.programEntryFrame , text = "Scale:")
         label5.grid( row = 1 , column = 4 )
-        self.timeEntry = ttk.Entry(self.frame1 , width = 5)
+        self.timeEntry = ttk.Entry(self.programEntryFrame , width = 5)
         self.timeEntry.grid( row = 0  , column = 5 ,  sticky = "EW" )
         self.timeEntry.bind("<1>" , self.handleClickTimeEntry)
-        self.timeScale = tk.Scale( self.frame1 , from_ = 0 , to = 100 , orient = tk.HORIZONTAL , resolution = 1)
+        self.timeScale = tk.Scale( self.programEntryFrame , from_ = 0 , to = 100 , orient = tk.HORIZONTAL , resolution = 1)
         self.timeScale.grid( row = 1 , column = 5 , sticky = "EW")
+        self.choseTimeUnite = ttk.Combobox( self.programEntryFrame , values = self.comboBoxList2 , width = 5 , state = "readonly")
+        self.choseTimeUnite.current(0)
+     #   self.choseTimeUnite.bind("<<ComboboxSelected>>" , self.changeUnite)
+        self.choseTimeUnite.grid( row = 0 , column = 6 , sticky = "EW")
 
-        addButton = ttk.Button(self.frame1 , text = "Add"  , width = 5 ,
-                              command = lambda : self.submitData(self.rpmEntry , self.timeEntry , self.programEntry , self.rpmScale , self.timeScale))
-        addButton.grid( row = 0  , column = 6 ,  sticky = "EW" , padx = 20)
-        removeButton = ttk.Button( self.frame1 , text = "Remove", width = 5 ,
-                               command = lambda : self.onRemove(self.tree.selection() , self.rpmEntry , self.timeEntry , self.programEntry , self.rpmScale , self.timeScale ))
-        removeButton.grid( row = 1 , column = 6 , sticky ="EW" , padx = 20)
+        self.dataframeButtonFrame = ttk.Frame(self.frame1)
+        self.dataframeButtonFrame.grid(row = 0 , column = 7 , columnspan = 2 ,  sticky = "NESW")
+        addButton = ttk.Button(self.dataframeButtonFrame, text = "Add"  , width = 5 ,
+                              command = lambda : self.addData(self.rpmEntry , self.timeEntry , self.programEntry , self.rpmScale , self.timeScale))
+        addButton.grid( row = 0  , column = 0 , sticky = "EW" , padx = 20 )
+        removeButton = ttk.Button( self.dataframeButtonFrame , text = "Remove", width = 5 ,
+                               command = lambda : self.removeData(self.tree.selection() , self.rpmEntry , self.timeEntry , self.programEntry , self.rpmScale , self.timeScale ))
+        removeButton.grid( row = 1 , column = 0 , sticky ="EW" , padx = 20)
+        updateButton = ttk.Button(self.dataframeButtonFrame , text = "Update" , width = 5 , command = lambda : self.updateData())
+        updateButton.grid(row = 2 , column = 0 , sticky = "EW" , padx = 20)
 
-        self.actionButtonFrame = ttk.Frame(self.frame1  , width = 5 )
-        self.actionButtonFrame.grid(row = 3 , column = 6 , sticky = "EW" , padx = 20)
+        self.actionButtonFrame = ttk.Frame(self.frame1 )
+        self.actionButtonFrame.grid(row = 3 , column = 7 , sticky = "EW" , padx = 20)
         self.choseProgramCombobox = ttk.Combobox(self.actionButtonFrame, values=self.comboBoxList,  text="Choose a" + "\n" + "Program", width=5)
         self.choseProgramCombobox.grid( row=0 , column=0 , columnspan = 2 ,  sticky="WE" )
         # choseProgramCombobox.bind('<<ComboboxSelected>>' , self.someFunction)
@@ -121,23 +134,29 @@ class Gui(ThemedTk):
         self.progressBar.grid( row = 2 , column = 0 , columnspan = 2  ,  sticky = "NWE" , pady = 20)
 
         exportButton = ttk.Button( self.frame1 , text = "Export as" "\n" + " CSV" , command = self.export , width = 5 )
-        exportButton.grid( row = 4 , column = 6 , sticky = "EW" , padx = 20 )
+        exportButton.grid( row = 4 , column = 7 , sticky = "EW" , padx = 20 )
 
         modeButton = ttk.Button( self.frame1 , text = "Light/Dark" + "\n"  "mode" , command = self.mode , width = 5)
-        modeButton.grid(row = 5 , column = 6 , sticky = "EW" , padx = 20)
+        modeButton.grid(row = 5 , column = 7 , sticky = "EW" , padx = 20)
+
+        tableRowUpButton = ttk.Button(self.frame1 , text = "Move Row up" , command = self.tableRowUp , width = 13)
+        tableRowUpButton.grid(row = 5 , column = 2 , sticky = "EW")
+        tableRowDownButton = ttk.Button(self.frame1 , text = "Move Row down" , command = self.tableRowDown , width = 13)
+        tableRowDownButton.grid(row = 5 , column = 4 , sticky = "EW")
 
 
-    def onRemove(self , iids , rpmEntry , timeEntry , programEntry , rpmScale , timeScale):
+    def removeData(self , iids , rpmEntry , timeEntry , programEntry , rpmScale , timeScale):
 
         val0 = programEntry.get()
         val1 = rpmEntry.get()
         val2 = timeEntry.get()
         val3 = rpmScale.get()
         val4 = timeScale.get()
+        VAL5 = self.choseTimeUnite.get()
 
         conn = sqlite3.connect("programs.db")
         cursor = conn.cursor()
-        sqlDeleteCondition = '''DELETE FROM 'program' WHERE programNumber = ? AND RPM = ? AND TIME = ? '''
+        sqlDeleteCondition = '''DELETE FROM 'program' WHERE programNumber = ? AND RPM = ? AND TIME = ? AND TIMEUNITE = ?'''
 
         if (val0 == "" or val1 == "" or val2 == ""):
 
@@ -151,7 +170,7 @@ class Gui(ThemedTk):
 
                 for data in fetch:
 
-                    cursor.execute( sqlDeleteCondition , data[0:3])
+                    cursor.execute( sqlDeleteCondition , data[0:4])
                     conn.commit()
 
                 self.tree.delete(iids)
@@ -162,7 +181,7 @@ class Gui(ThemedTk):
 
                     dicValues = self.tree.item(iid)
                     parentIid = self.tree.parent(iid)
-                    cursor.execute( sqlDeleteCondition , (parentIid, dicValues["values"][0] , dicValues["values"][1]))
+                    cursor.execute( sqlDeleteCondition , (parentIid, dicValues["values"][0] , int(dicValues["values"][1][0:2]) , dicValues["values"][1][:-3]))
                     conn.commit()
 
                     self.tree.delete(iid)
@@ -177,13 +196,14 @@ class Gui(ThemedTk):
         cursor.close()
 
 
-    def submitData(self , rpmEntry , timeEntry , programEntry , rpmScale , timeScale):
+    def addData(self , rpmEntry , timeEntry , programEntry , rpmScale , timeScale):
 
         val0 = programEntry.get()
         val1 = rpmEntry.get()
         val2 = timeEntry.get()
         val3 = rpmScale.get()
         val4 = timeScale.get()
+        val5 = self.choseTimeUnite.get()
 
         conn = sqlite3.connect("programs.db")
         cursor = conn.cursor()
@@ -224,11 +244,12 @@ class Gui(ThemedTk):
             if (not bol):
                 self.addNewProgram(val0)
 
-            cursor.execute("INSERT INTO  'program' VALUES(:programNumber , :RPM , :TIME)",
+            cursor.execute("INSERT INTO  'program' VALUES(:programNumber , :RPM , :TIME , :TIMEUNITE)",
                            {
                                'programNumber' : val0,
                                'RPM' : val1,
-                               'TIME' : val2
+                               'TIME' : val2,
+                               'TIMEUNITE' : val5
                           })
 
             cursor.execute("SELECT *, oid FROM program")
@@ -241,9 +262,8 @@ class Gui(ThemedTk):
             conn.commit()
             cursor.close()
 
-            self.tree.insert(val0 , index = "end" , values = (fetch[-1][1], fetch[-1][2]))
+            self.tree.insert(val0 , index = "end" , values = (fetch[-1][1], ("%(1)d  %(2)s") % {"1": fetch[-1][2] , "2": self.choseTimeUnite.get()}))
 
-          #  programEntry.delete( 0 , "end")   # i find it anoying to always enter the program number again, if a new program is created, it will probably contain at least 2 rows of information
             rpmEntry.delete( 0 , "end")
             timeEntry.delete( 0  , "end")
 
@@ -270,11 +290,12 @@ class Gui(ThemedTk):
             if (not bol):
                 self.addNewProgram(val0)
 
-            cursor.execute("INSERT INTO  'program' VALUES(:programNumber , :RPM , :TIME)",
+            cursor.execute("INSERT INTO  'program' VALUES(:programNumber , :RPM , :TIME , :TIMEUNITE)",
                            {
                                'programNumber': val0,
                                'RPM': val3,
-                               'TIME': val4
+                               'TIME': val4,
+                               'TIMEUNITE': val5
                            })
 
             cursor.execute("SELECT *, oid FROM program")
@@ -297,6 +318,22 @@ class Gui(ThemedTk):
 
             tkMessageBox.showerror( title = "WARNING" , message = "Please make sure that the value you selected with the"
                                                                   " RPM or TIME scale matches the value entered in the RPM or Time entry box")
+
+
+    def updateData(self):
+
+        if (self.iid == None):
+
+            pass
+
+        else:
+
+            values = [self.rpmEntry.get() , str(self.timeEntry.get()) + " " + self.choseTimeUnite.get()]
+            self.tree.set(self.iid , column = "RPM" , value = values[0])
+            self.tree.set(self.iid, column="time", value=values[1])
+
+            parentNumber = self.tree.parent(self.iid)
+            self.loadTreeViewIntoDataBase(parentNumber)
 
 
     def addNewProgram(self, val0 ):
@@ -335,7 +372,8 @@ class Gui(ThemedTk):
         cursor.execute('''CREATE TABLE IF NOT EXISTS program (
                         programNumber INTEGER , 
                         RPM INTEGER , 
-                        TIME INTEGER )''')
+                        TIME INTEGER,
+                        TIMEUNITE TEXT)''')   # I think instead of string the data type text should be used, as string is not really a sql language data type
 
         self.loadDataBaseIntoTreeView()
         cursor.close()
@@ -358,10 +396,14 @@ class Gui(ThemedTk):
 
             if (not bol):
                 self.addNewProgram(data[0])
-                self.tree.insert(data[0], index="end", values=(data[1], data[2]))
+                self.tree.insert(data[0], index="end", values=(data[1], ("%(1)d %(2)s") % {"1": data[2] , "2" : data[3]}))
 
             else:
-                self.tree.insert(data[0], index="end", values=(data[1], data[2]))
+                self.tree.insert(data[0], index="end", values=(data[1], ("%(1)d %(2)s") % {"1": data[2] , "2" : data[3]}))
+
+        for column in self.tree["columns"]:
+
+            self.tree.column( column , anchor = tk.CENTER)
 
         self.uniqueElementsOfList()
 
@@ -370,8 +412,32 @@ class Gui(ThemedTk):
         conn.close()
 
 
-    def transmitData(self):
-        return
+    def loadTreeViewIntoDataBase(self , parentNumber):
+
+        parentNumber = str(parentNumber)
+        iids = self.tree.get_children(parentNumber)
+
+        conn = sqlite3.connect("programs.db")
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM program WHERE programNumber = ? ", (parentNumber,))
+
+        for iid in iids:
+
+            recordData = self.tree.item(iid)["values"]
+
+            cursor.execute("INSERT INTO  program VALUES(:programNumber , :RPM , :TIME , :TIMEUNITE)",
+                           {
+                               'programNumber': int(parentNumber),
+                               'RPM': recordData[0],
+                               'TIME': int(recordData[1][0:2]),
+                               'TIMEUNITE': recordData[1][-1]
+                           })
+
+
+
+        cursor.close()
+        conn.commit()
+        conn.close()
 
 
     def export(self):
@@ -424,8 +490,8 @@ class Gui(ThemedTk):
 
     def initiateProgram(self):
 
+        self.progressBar["value"] = 0
         self.threadAlive = True
-
 
         totalTime = 0
         interval = 0
@@ -439,32 +505,52 @@ class Gui(ThemedTk):
         cursor = conn.cursor()
         programNumber = self.getProgramNumber()
         cursor.execute(" SELECT *, oid FROM program WHERE programNumber = ?" , (programNumber,))
-        fetch = cursor.fetchall()
+        self.fetch = cursor.fetchall()
 
         for row in fetch:
 
             totalTime += row[2]
 
         interval =  int ((totalTime / 100)  * self.timeMode * 1000) # the * 1000 is necessary as the prograssbar measures everythin in miliseconds and not seconds
-        self.progressBar.start([interval])
 
-        for row in fetch:
+        def startProgessbar(interval):
 
-            self.raspberry.changePWM(notebookSelectedTabNumber , row[1])
-            time.sleep(row[2] * self.timeMode)
+            while(self.threadAlive):
 
-        self.progressBar.stop()
+                for i in range(100):
 
-        self.raspberry.motorStop(MOTORA , MOTORB) #ll
+                    self.progressBar["value"] +=1
+                    time.sleep(interval / 100)
+                    condition = False
 
-        tkMessageBox.showinfo("Program finished",  "The program is finished!") ### fuehrt zu problemen wen das Gui vom user derminated wird, bevor das Program fertig ist
+                self.progressBar["value"] = 0
+                self.thread2.join()
+
+        def startProgram():
+
+            while(self.threadAlive):
 
 
-        self.thread = threading.Thread( target = startProgram)
-        self.thread.start()
+                self.inititateProgramButton["state"] = tk.DISABLED
+                for row in fetch:
 
+                    self.raspberry.changePWM(notebookSelectedTabNumber , row[1])
+                    time.sleep(row[2] * self.timeMode)
 
-        self.threadAlive = False
+                self.raspberry.motorStop(MOTORA , MOTORB) #ll
+
+                if(self.threadAlive):
+
+                     tkMessageBox.showinfo("Program finished" , " The Program is finished!")
+                     self.threadAlive = False
+                     self.initiateProgramButton["state"] = tk.NORMAL
+
+        self.thread1 = threading.Thread(target = startProgram)
+        self.thread2 = threading.Thread(target = startProgessbar , arggs = (interval, ))
+
+        self.thread1.start()
+        self.thread2.start()
+
 
     def getProgramNumber(self):
 
@@ -501,14 +587,19 @@ class Gui(ThemedTk):
 
             self.choseProgramCombobox.current([0])
 
+
     def terminateProgram(self):
 
+        notebookSelectedTabNumber = selff.getNotebookSelectedTabNumber()
         MOTORA = self.raspberry.dicSetup["MOTOR" + str(notebookSelectedTabNumber) + "A"]
         MOTORB = self.raspberry.dicSetup["MOTOR" + str(notebookSelectedTabNumber) + "B"]
         self.raspberry.motorStop(MOTORA, MOTORB)
 
         self.threadAlive = False
+        self.fetch = None
+        self.thread1.join()
 
+        self.initiateProgramButton["state"] = tk.NORMAL
 
 
     def disable_event( self):
@@ -524,6 +615,7 @@ class Gui(ThemedTk):
 
             self.destroy()
 
+
     def handleClickProgramEntry(self , event):
 
         self.programEntry.delete(0 , tk.END)
@@ -532,6 +624,7 @@ class Gui(ThemedTk):
         topLevel = GuiNumberField()
         topLevel.wait_window()
         self.programEntry.insert( 0  , string)
+
 
     def handleClickRpmEntry(self , event):
 
@@ -542,6 +635,7 @@ class Gui(ThemedTk):
         topLevel.wait_window()
         self.rpmEntry.insert( 0  , string)
 
+
     def handleClickTimeEntry(self , event):
 
         self.timeEntry.delete(0 , tk.END)
@@ -551,6 +645,90 @@ class Gui(ThemedTk):
         topLevel.wait_window()
         self.timeEntry.insert( 0  , string)
 
+
+    def changeUnite(self , event):
+
+        self.label4["text"] = ("TIME(%(1)s)") % {"1": self.choseTimeUnite.get()}
+        self.tree.heading("#2", text=("TIME(%(1)s)") % {"1": self.choseTimeUnite.get()})
+
+        if (self.choseTimeUnite.get() == "H"):
+
+            self.timeMode = 60  * 60
+
+        elif (self.choseTimeUnite.get() == "Min"):
+
+            self.timeMode = 60
+
+        elif(self.choseTimeUnite.get() == "Sec"):
+
+            self.timeMode = 1
+
+
+    def tableRowUp(self):
+
+        if ( not self.tree.selection()):
+
+            tkMessageBox.showinfo("Error", "Please select the row of the table that you want to move up")
+
+        elif (len(self.tree.selection()[0]) <= 2):
+
+            tkMessageBox.showinfo("Error", ("Please open the table belonging to program %(1)s or select a row") % {
+                "1": self.tree.selection()[0]})
+
+        else:
+
+            iids = self.tree.selection()
+            parentNumber = int(self.tree.parent(iids[0]))
+
+            for iid in iids:
+
+                self.tree.move( iid , self.tree.parent(iid) , self.tree.index(iid) - 1)
+
+            self.loadTreeViewIntoDataBase(parentNumber)
+
+
+    def tableRowDown(self):
+
+        if ( not self.tree.selection()):
+
+            tkMessageBox.showinfo("Error", "Please select the row of the table that you want to move down")
+
+        elif( len( self.tree.selection()[0]) <=2 ):
+
+            tkMessageBox.showinfo("Error" , ("Please open the table belonging to program %(1)s or selected a row ") % {"1" : self.tree.selection()[0]})
+
+        else:
+
+            iids = self.tree.selection()
+            parentNumber = int(self.tree.parent(iids[0]))
+
+            for iid in reversed(iids):
+
+                self.tree.move( iid , self.tree.parent(iid) , self.tree.index(iid) + 1)
+
+            self.loadTreeViewIntoDataBase(parentNumber)
+
+
+    def updateRecord(self , event):
+
+        # clear the text entry of all entry widgets
+        self.programEntry.delete(0 , "end")
+        self.rpmEntry.delete(0 , "end")
+        self.timeEntry.delete(0 , "end")
+
+        #Grab the record/row number
+        iid = self.tree.focus()
+        self.iid = iid # import for the function updateData, so that the script knows which row to update
+
+        #Grab the record/row values
+        values = self.tree.item(iid , "values")
+
+        #Output to the entry boxes
+        self.programEntry.insert(0 , self.tree.parent(iid))
+        self.rpmEntry.insert(0 , values[0])
+        self.timeEntry.insert(0 , int(values[1][0:2]))
+
+
     def easterEgg(self):
 
         global my_img
@@ -559,8 +737,6 @@ class Gui(ThemedTk):
         top.geometry( "250x250" )
         my_img = ImageTk.PhotoImage(Image.open( "/Users/jonasmarschick/Desktop/easterEgg.png"))
         tk.Label(top, image=my_img).pack()
-
-
 
 
 class GuiNumberField(tk.Toplevel):  # ThemedTk
@@ -588,6 +764,7 @@ class GuiNumberField(tk.Toplevel):  # ThemedTk
         enterButton.grid( row = 0 , column = 2 , sticky = "NESW")
         deleteButton = ttk.Button(self.frame , text = "Delete" , command = lambda : self.deleteEntry())
         deleteButton.grid( row = 1 , column = 2 , sticky = "NESW")
+
 
     def generateButtons(self):
 
@@ -623,6 +800,7 @@ class GuiNumberField(tk.Toplevel):  # ThemedTk
 
             frame.rowconfigure( i , weight = 1 , minsize = 2 )
 
+
     def submitData(self , text):
 
         self.Entry.delete(0 , tk.END)
@@ -636,11 +814,13 @@ class GuiNumberField(tk.Toplevel):  # ThemedTk
 
         self.Entry.insert(0, string)
 
+
     def deleteEntry(self):
 
         global string
         string = ""
         self.Entry.delete(0 , "end")
+
 
     def enterEntry(self):
 
@@ -654,6 +834,7 @@ class GuiNumberField(tk.Toplevel):  # ThemedTk
         else:
 
             pass
+
 
     def getString(self):
 
